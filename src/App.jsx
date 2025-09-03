@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function Camera() {
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
     async function initCamera() {
@@ -31,14 +33,42 @@ function Camera() {
     initCamera();
   }, []);
 
+  const takePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    if (video && canvas) {
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Save image as data URL
+      const dataUrl = canvas.toDataURL("image/png");
+      setPhoto(dataUrl);
+    }
+  };
+
   return (
-    <div>
+    <div style={{ textAlign: "center" }}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        style={{ width: "100%", height: "auto" }}
+        style={{ width: "100%", maxWidth: "400px" }}
       />
+      <br />
+      <button onClick={takePhoto} style={{ marginTop: "10px" }}>
+        📸 Take Photo
+      </button>
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+
+      {photo && (
+        <div style={{ marginTop: "15px" }}>
+          <h3>Captured Photo:</h3>
+          <img src={photo} alt="Captured" style={{ width: "100%", maxWidth: "400px" }} />
+        </div>
+      )}
     </div>
   );
 }
