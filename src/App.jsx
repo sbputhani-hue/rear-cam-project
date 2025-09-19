@@ -75,52 +75,106 @@
 
 // export default Camera;
 
-import { useEffect, useRef, useState } from "react";
+// import { useEffect, useRef, useState } from "react";
 
-function Camera() {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+// function Camera() {
+//   const videoRef = useRef(null);
+//   const canvasRef = useRef(null);
+//   const [photo, setPhoto] = useState(null);
+
+//   useEffect(() => {
+//     async function initCamera() {
+//       try {
+//         const stream = await navigator.mediaDevices.getUserMedia({
+//           video: { facingMode: { ideal: "environment" } }, // ✅ better than exact
+//           audio: false,
+//         });
+//         if (videoRef.current) {
+//           videoRef.current.srcObject = stream;
+//         }
+//       } catch (err) {
+//         console.error("Error accessing camera:", err);
+//       }
+//     }
+//     initCamera();
+//   }, []);
+
+//   const takePhoto = () => {
+//     const video = videoRef.current;
+//     const canvas = canvasRef.current;
+//     if (!video || !canvas) return;
+
+//     canvas.width = video.videoWidth;
+//     canvas.height = video.videoHeight;
+//     const ctx = canvas.getContext("2d");
+//     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+//     setPhoto(canvas.toDataURL("image/png"));
+//   };
+
+//   return (
+//     <div style={{ textAlign: "center" }}>
+//       <video
+//         ref={videoRef}
+//         autoPlay
+//         playsInline
+//         muted
+//         style={{ width: "100%", height: "auto" }}
+//       />
+//       <button
+//         onClick={takePhoto}
+//         style={{
+//           marginTop: "10px",
+//           padding: "10px 20px",
+//           fontSize: "16px",
+//           borderRadius: "8px",
+//         }}
+//       >
+//         Take Photo
+//       </button>
+
+//       <canvas ref={canvasRef} style={{ display: "none" }} />
+
+//       {photo && (
+//         <div style={{ marginTop: "20px" }}>
+//           <h4>Captured Photo:</h4>
+//           <img src={photo} alt="Captured" style={{ width: "100%" }} />
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default Camera;
+
+import { useRef, useState } from "react";
+import { Camera } from "react-camera-pro";
+
+function CameraComponent() {
+  const cameraRef = useRef(null); // ✅ just null, no types
   const [photo, setPhoto] = useState(null);
 
-  useEffect(() => {
-    async function initCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } }, // ✅ better than exact
-          audio: false,
-        });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (err) {
-        console.error("Error accessing camera:", err);
-      }
-    }
-    initCamera();
-  }, []);
-
   const takePhoto = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    setPhoto(canvas.toDataURL("image/png"));
+    if (cameraRef.current) {
+      const capturedPhoto = cameraRef.current.takePhoto(); // returns string
+      setPhoto(capturedPhoto);
+    }
   };
 
   return (
     <div style={{ textAlign: "center" }}>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        style={{ width: "100%", height: "auto" }}
+      <Camera
+        ref={cameraRef}
+        facingMode="environment" // rear camera
+        aspectRatio="cover"
+        errorMessages={{
+          noCameraAccessible: "No camera found",
+          permissionDenied: "Camera permission denied",
+          switchCamera: "Cannot switch camera",
+          canvas: "Canvas not supported",
+        }}
       />
+
       <button
         onClick={takePhoto}
         style={{
@@ -128,12 +182,12 @@ function Camera() {
           padding: "10px 20px",
           fontSize: "16px",
           borderRadius: "8px",
+          backgroundColor: "green",
+          color: "white",
         }}
       >
         Take Photo
       </button>
-
-      <canvas ref={canvasRef} style={{ display: "none" }} />
 
       {photo && (
         <div style={{ marginTop: "20px" }}>
@@ -145,4 +199,5 @@ function Camera() {
   );
 }
 
-export default Camera;
+export default CameraComponent;
+
