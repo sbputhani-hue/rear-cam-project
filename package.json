@@ -2,6 +2,7 @@
   "name": "rear_cam_project",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://sbputhani-hue.github.io/rear-cam-project/",
   "type": "module",
   "scripts": {
     "dev": "vite",
